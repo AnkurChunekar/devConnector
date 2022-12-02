@@ -15,6 +15,9 @@ const PORT = process.env.PORT;
 // connect to db
 initializeDbConnection();
 
+// middleware init
+app.use(express.json({ extended: false }));
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
