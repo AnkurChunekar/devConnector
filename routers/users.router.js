@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 
+const { validationErrMsgs } = require("../constants/stringConstants");
+
 /* 
 @route POST api/users
 @desc Add a new user
@@ -9,12 +11,9 @@ const { check, validationResult } = require("express-validator");
 */
 
 const validators = [
-  check("email", "email is invalid").isEmail(),
-  check("name", "please provide a valid name").not().isEmpty(),
-  check(
-    "password",
-    "password length should be minimum 6 characters long"
-  ).isLength({ min: 6 }),
+  check("email", validationErrMsgs.email).isEmail(),
+  check("name", validationErrMsgs.name).not().isEmpty(),
+  check("password", validationErrMsgs.password).isLength({ min: 6 }),
 ];
 
 router.route("/").post(validators, (req, res) => {
