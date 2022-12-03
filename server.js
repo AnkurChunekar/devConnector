@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.use("/api/auth", authVerify, authRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/profile", profileRouter);
