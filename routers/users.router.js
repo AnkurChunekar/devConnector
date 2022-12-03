@@ -3,6 +3,7 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const { validationErrMsgs } = require("../constants/stringConstants");
 const UserModel = require("../models/User.model");
@@ -50,7 +51,17 @@ router.route("/").post(validators, async (req, res) => {
 
   await user.save();
 
-  res.json({ message: "user registered successfully" });
+  jwt.sign(
+    { userId: user.id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d",
+    },
+    (err, token) => {
+      if (err) throw err;
+      else res.json({ message: "user registered successfully", token });
+    }
+  );
 });
 
 module.exports = router;
