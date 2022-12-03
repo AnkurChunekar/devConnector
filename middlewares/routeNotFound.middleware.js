@@ -1,5 +1,7 @@
+const { getErrorsObj } = require("../utillities/utils");
+
 const routeNotFound = (req, res, next) => {
-  res.status(404).json({ message: "route not found" });
+  res.status(404).json(getErrorsObj("route not found"));
   next();
 };
 
