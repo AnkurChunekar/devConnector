@@ -4,6 +4,7 @@ const validationErrMsgs = {
   email: getCommonErrMsg("email"),
   password: "Password length should be atleast 6 characters long",
   name: getCommonErrMsg("name"),
+  passwordCommon: getCommonErrMsg("password"),
 };
 
 module.exports = { validationErrMsgs };
