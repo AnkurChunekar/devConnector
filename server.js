@@ -11,6 +11,7 @@ const profileRouter = require("./routers/profile.router");
 
 const routeNotFound = require("./middlewares/routeNotFound.middleware");
 const errorHandler = require("./middlewares/errorHandler.middleware");
+const authVerify = require("./middlewares/authVerify.middleware");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -25,7 +26,7 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-app.use("/api/auth", authRouter);
+app.use("/api/auth", authVerify, authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/profile", profileRouter);
