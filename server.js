@@ -9,6 +9,10 @@ const postsRouter = require("./routers/posts.router");
 const usersRouter = require("./routers/users.router");
 const profileRouter = require("./routers/profile.router");
 
+const routeNotFound = require("./middlewares/routeNotFound.middleware");
+const errorHandler = require("./middlewares/errorHandler.middleware");
+const authVerify = require("./middlewares/authVerify.middleware");
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -26,5 +30,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/profile", profileRouter);
+
+// error handling routes
+app.use(routeNotFound);
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server running at port ${PORT}`));
