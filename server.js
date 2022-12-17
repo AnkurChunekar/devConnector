@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
-app.use("/api/profile", profileRouter);
+app.use("/api/profiles", profileRouter);
 
 // error handling routes
 app.use(routeNotFound);
