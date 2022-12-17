@@ -31,7 +31,7 @@ const ProfileSchema = new mongoose.Schema({
       description: String,
     },
   ],
-  social: {
+  socials: {
     linkedin: String,
     twitter: String,
     instagram: String,
