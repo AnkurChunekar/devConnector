@@ -7,7 +7,7 @@ const { initializeDbConnection } = require("./db/db.connect");
 const authRouter = require("./routers/auth.router");
 const postsRouter = require("./routers/posts.router");
 const usersRouter = require("./routers/users.router");
-const profileRouter = require("./routers/profile.router");
+const profileRouter = require("./routers/profile");
 
 const routeNotFound = require("./middlewares/routeNotFound.middleware");
 const errorHandler = require("./middlewares/errorHandler.middleware");
