@@ -2,4 +2,13 @@ const getErrorsObj = (msg) => ({
   errors: [{ msg }],
 });
 
-module.exports = { getErrorsObj };
+const getSanitizedObj = (keysArr, objToSanitize = {}) => {
+  const result = {};
+  for (let key of keysArr) {
+    if (objToSanitize[key] !== undefined) result[key] = objToSanitize[key];
+  }
+
+  return result;
+};
+
+module.exports = { getErrorsObj, getSanitizedObj };
