@@ -4,8 +4,9 @@ const router = express.Router();
 
 const authVerify = require("../middlewares/authVerify.middleware");
 const Profile = require("../models/Profile.model");
+const User = require("../models/User.model");
 require("../models/User.model");
-const { getErrorsObj } = require("../utillities/utils");
+const { getErrorsObj, getSanitizedObj } = require("../utillities/utils");
 
 const socialsArr = ["linkedin", "twitter", "youtube", "facebook", "instagram"];
 
@@ -20,13 +21,16 @@ const profileKeysArr = [
   "social",
 ];
 
-const getSanitizedObj = (keysArr, objToSanitize = {}) => {
-  const result = {};
-  for (let key of keysArr) {
-    if (objToSanitize[key] !== undefined) result[key] = objToSanitize[key];
-  }
-
-  return result;
+const KEYS_ARRAY = {
+  experience: [
+    "title",
+    "company",
+    "location",
+    "from",
+    "to",
+    "current",
+    "description",
+  ],
 };
 
 /* 
@@ -75,18 +79,6 @@ router.route("/user/:userId").get(async (req, res) => {
   }
 });
 
-/* 
-
-@route GET api/profiles/me
-@desc Get current users profile data.
-@access Private
-
-@route POST api/profiles/me
-@desc Create or update user profile
-@access Private
-
-*/
-
 const validators = [
   check("status", "status is required").not().isEmpty(),
   check("skills", "skills are required").not().isEmpty(),
@@ -94,6 +86,10 @@ const validators = [
 
 router
   .route("/me")
+
+  // @route GET api/profiles/me
+  // @desc Get current users profile data.
+  // @access Private
 
   .get(authVerify, async (req, res) => {
     try {
@@ -108,6 +104,10 @@ router
       res.status(500).json(getErrorsObj(error.message));
     }
   })
+
+  // @route POST api/profiles/me
+  // @desc Create or update user profile
+  // @access Private
 
   .post(authVerify, validators, async (req, res) => {
     const errors = validationResult(req);
@@ -150,6 +150,61 @@ router
 
       res.json(profile);
     } catch (error) {
+      res.status(500).json(getErrorsObj(error.message));
+    }
+  })
+
+  // @route DELETE api/profiles/me
+  // @desc deletes both current user data and profile
+  // @access Private
+
+  .delete(authVerify, async (req, res) => {
+    try {
+      const { userId } = req.user;
+      await Profile.findOneAndRemove({ user: userId });
+      await User.findOneAndRemove({ _id: userId });
+
+      res.json({ message: "user deleted successfully" });
+    } catch (error) {
+      res.status(500).json(getErrorsObj(error.message));
+    }
+  });
+
+// @route POST api/profiles/me/experience
+// @desc adds new experience data to profile
+// @access Private
+
+const expValidators = [
+  check("title", "title is required").not().isEmpty(),
+  check("company", "company is required").not().isEmpty(),
+  check("from", "from date is required").isDate({ format: "DD-MM-YYYY" }),
+];
+
+const delExpValidators = [check("_id", "_id is required").not().isEmpty()];
+
+router
+  .route("/me/experience")
+  .post(authVerify, expValidators, async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { userId } = req.user;
+
+      const expData = getSanitizedObj(KEYS_ARRAY.experience, req.body);
+      const profile = await Profile.findOne({ user: userId });
+
+      if (!profile)
+        return res.status(400).json(getErrorsObj("Profile doesn't exists"));
+
+      profile.experience.unshift(expData);
+
+      const newProfile = await profile.save();
+      res.json({ profile: newProfile });
+    } catch (error) {
+      console.log(error.message);
       res.status(500).json(getErrorsObj(error.message));
     }
   });
