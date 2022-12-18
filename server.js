@@ -7,7 +7,7 @@ const { initializeDbConnection } = require("./db/db.connect");
 const authRouter = require("./routers/auth.router");
 const postsRouter = require("./routers/posts.router");
 const usersRouter = require("./routers/users.router");
-const profileRouter = require("./routers/profile.router");
+const profileRouter = require("./routers/profile");
 
 const routeNotFound = require("./middlewares/routeNotFound.middleware");
 const errorHandler = require("./middlewares/errorHandler.middleware");
@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/users", usersRouter);
-app.use("/api/profile", profileRouter);
+app.use("/api/profiles", profileRouter);
 
 // error handling routes
 app.use(routeNotFound);
