@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
-app.use("/api/posts", postsRouter);
+app.use("/api/posts", authVerify, postsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/profiles", profileRouter);
 
