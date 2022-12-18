@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 
 const authVerify = require("../../middlewares/authVerify.middleware");
 const Profile = require("../../models/Profile.model");
@@ -42,6 +43,33 @@ router.route("/user/:userId").get(async (req, res) => {
     if (error.kind === "ObjectId")
       return res.status(400).json(getErrorsObj("profile not found"));
     res.status(500).json(error);
+  }
+});
+
+// @route Get api/profiles/github/:username
+// @desc Gets user repos from github
+// @access Public
+
+router.get("/github/:username", async (req, res) => {
+  try {
+    const url = `https://api.github.com/users/${req.params.username}/repos`;
+    const response = await axios.get(url, {
+      params: {
+        per_page: "5",
+        sort: "created:asc",
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
+      },
+      timeout: 5000,
+    });
+
+    if (response.status !== 200)
+      return res.status(404).json(getErrorsObj("github profile not found"));
+
+    res.json({ repos: response.data });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json(getErrorsObj(error.message));
   }
 });
 
