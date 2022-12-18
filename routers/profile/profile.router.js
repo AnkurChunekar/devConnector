@@ -7,6 +7,7 @@ const Profile = require("../../models/Profile.model");
 const User = require("../../models/User.model");
 const { getErrorsObj, getSanitizedObj } = require("../../utillities/utils");
 const experienceRouter = require("./experience.router");
+const educationRouter = require("./education.router");
 
 const socialsArr = ["linkedin", "twitter", "youtube", "facebook", "instagram"];
 
@@ -159,5 +160,6 @@ router
   });
 
 router.use("/me/experience", authVerify, experienceRouter);
+router.use("/me/education", authVerify, educationRouter);
 
 module.exports = router;
