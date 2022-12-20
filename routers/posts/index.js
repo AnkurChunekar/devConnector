@@ -1,9 +1,10 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
 
-const Post = require("../models/Post.model");
-const User = require("../models/User.model");
-const { getErrorsObj } = require("../utillities/utils");
+const Post = require("../../models/Post.model");
+const User = require("../../models/User.model");
+const { getErrorsObj } = require("../../utillities/utils");
+const likeRouter = require("./like.router");
 
 const router = express.Router();
 
@@ -103,5 +104,7 @@ router
       res.status(500).json(getErrorsObj(error.message));
     }
   });
+
+router.use("/like", likeRouter);
 
 module.exports = router;

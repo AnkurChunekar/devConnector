@@ -5,7 +5,7 @@ require("dotenv").config();
 // internal
 const { initializeDbConnection } = require("./db/db.connect");
 const authRouter = require("./routers/auth.router");
-const postsRouter = require("./routers/posts.router");
+const postsRouter = require("./routers/posts");
 const usersRouter = require("./routers/users.router");
 const profileRouter = require("./routers/profile");
 

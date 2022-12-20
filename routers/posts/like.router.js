@@ -1,0 +1,47 @@
+const express = require("express");
+// const { check, validationResult } = require("express-validator");
+
+const Post = require("../../models/Post.model");
+// const User = require("../../models/User.model");
+const { getErrorsObj } = require("../../utillities/utils");
+
+const router = express.Router();
+
+// const VALIDATORS = {
+//   post: [check("text", "text is required").not().isEmpty()],
+// };
+
+// @route POST api/posts/like/:id
+// @desc add user id to the post of given id
+// @access Private
+
+router.route("/:id").put(async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post) return res.status(404).json(getErrorsObj("Post not found"));
+
+    const isAlreadyLiked = post.likes.some(
+      (item) => item.user.toString() === userId
+    );
+    if (isAlreadyLiked)
+      return res.json({ message: "post is already liked by the user" });
+
+    post.likes.push({ user: userId });
+
+    const savedPost = await post.save();
+
+    // res.json({ message: "post successfully liked" });
+    res.json(savedPost);
+  } catch (error) {
+    console.log(error.message);
+    if (error.kind === "ObjectId")
+      return res.status(404).json(getErrorsObj("Post not found"));
+
+    res.status(500).json(getErrorsObj(error.message));
+  }
+});
+
+module.exports = router;
