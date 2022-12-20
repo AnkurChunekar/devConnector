@@ -15,10 +15,8 @@ const router = express.Router();
 // @desc add user id to the post of given id
 // @access Private
 
-router.route("/:id").put(async (req, res) => {
+router.route("/like/:id").put(async (req, res) => {
   try {
-    const { userId } = req.user;
-
     const post = await Post.findById(req.params.id);
 
     if (!post) return res.status(404).json(getErrorsObj("Post not found"));
@@ -27,14 +25,35 @@ router.route("/:id").put(async (req, res) => {
       (item) => item.user.toString() === userId
     );
     if (isAlreadyLiked)
-      return res.json({ message: "post is already liked by the user" });
+      return res.status(400).json(getErrorsObj("post already liked"));
 
-    post.likes.push({ user: userId });
+    post.likes.unshift({ user: req.user.userId });
 
-    const savedPost = await post.save();
+    await post.save();
 
-    // res.json({ message: "post successfully liked" });
-    res.json(savedPost);
+    res.json(post.likes);
+  } catch (error) {
+    console.log(error.message);
+    if (error.kind === "ObjectId")
+      return res.status(404).json(getErrorsObj("Post not found"));
+
+    res.status(500).json(getErrorsObj(error.message));
+  }
+});
+
+router.route("/unlike/:id").put(async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) return res.status(404).json(getErrorsObj("Post not found"));
+
+    post.likes = post.likes.filter(
+      (item) => item.user.toString() !== req.user.userId
+    );
+
+    await post.save();
+
+    res.json(post.likes);
   } catch (error) {
     console.log(error.message);
     if (error.kind === "ObjectId")

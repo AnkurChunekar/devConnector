@@ -105,6 +105,7 @@ router
     }
   });
 
-router.use("/like", likeRouter);
+// This route path will match /like and /unlike.
+router.use("/", likeRouter);
 
 module.exports = router;
