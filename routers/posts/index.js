@@ -57,15 +57,15 @@ router
     }
   });
 
-// @route GET api/posts/:id
-// @desc Get single post with the given id
+// @route GET api/posts/:postId
+// @desc Get single post with the given postId
 // @access Private
 
 router
-  .route("/:id")
+  .route("/:postId")
   .get(async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id);
+      const post = await Post.findById(req.params.postId);
 
       if (!post) return res.status(404).json(getErrorsObj("Post not found"));
 
@@ -79,13 +79,13 @@ router
     }
   })
 
-  // @route DELETE api/posts/:id
-  // @desc Delete single post with the given id
+  // @route DELETE api/posts/:postId
+  // @desc Delete single post with the given postId
   // @access Private
 
   .delete(async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id);
+      const post = await Post.findById(req.params.postId);
 
       if (!post) return res.status(404).json(getErrorsObj("Post not found"));
 
@@ -105,7 +105,63 @@ router
     }
   });
 
-// This route path will match /like and /unlike.
+router.put("/:postId/comment", VALIDATORS.post, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { userId } = req.user;
+    const post = await Post.findById(req.params.postId);
+    const user = await User.findById(userId).select("-password");
+
+    if (!post) return res.status(404).json(getErrorsObj("Post not found"));
+
+    post.comments.push({
+      user: userId,
+      name: user.name,
+      avatar: user.avatar,
+      text: req.body.text,
+    });
+
+    await post.save();
+
+    res.json(post.comments);
+  } catch (error) {
+    console.log(error.message);
+    if (error.kind === "ObjectId")
+      return res.status(404).json(getErrorsObj("Post not found"));
+
+    res.status(500).json(getErrorsObj(error.message));
+  }
+});
+
+// @route DELETE api/posts/:postId/comment/:commentId
+// @desc delete the comment with given id
+// @access Private
+
+router.delete("/:postId/comment/:commentId", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) return res.status(404).json(getErrorsObj("Post not found"));
+
+    post.comments = post.comments.filter(
+      (item) => item._id.valueOf() !== req.params.commentId
+    );
+
+    await post.save();
+
+    res.json(post.comments);
+  } catch (error) {
+    console.log(error.message);
+    if (error.kind === "ObjectId")
+      return res.status(404).json(getErrorsObj("Post not found"));
+
+    res.status(500).json(getErrorsObj(error.message));
+  }
+});
+
 router.use("/", likeRouter);
 
 module.exports = router;

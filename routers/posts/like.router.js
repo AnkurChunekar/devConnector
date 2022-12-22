@@ -22,7 +22,7 @@ router.route("/like/:id").put(async (req, res) => {
     if (!post) return res.status(404).json(getErrorsObj("Post not found"));
 
     const isAlreadyLiked = post.likes.some(
-      (item) => item.user.toString() === userId
+      (item) => item.user.toString() === req.user.userId
     );
     if (isAlreadyLiked)
       return res.status(400).json(getErrorsObj("post already liked"));
