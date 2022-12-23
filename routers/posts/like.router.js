@@ -1,15 +1,9 @@
 const express = require("express");
-// const { check, validationResult } = require("express-validator");
 
 const Post = require("../../models/Post.model");
-// const User = require("../../models/User.model");
 const { getErrorsObj } = require("../../utillities/utils");
 
 const router = express.Router();
-
-// const VALIDATORS = {
-//   post: [check("text", "text is required").not().isEmpty()],
-// };
 
 // @route POST api/posts/like/:id
 // @desc add user id to the post of given id
