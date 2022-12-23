@@ -146,9 +146,24 @@ router.delete("/:postId/comment/:commentId", async (req, res) => {
 
     if (!post) return res.status(404).json(getErrorsObj("Post not found"));
 
-    post.comments = post.comments.filter(
-      (item) => item._id.valueOf() !== req.params.commentId
-    );
+    let authorised = false;
+
+    const newComments = post.comments.filter((item) => {
+      const isIdEqual = item._id.valueOf() === req.params.commentId;
+      if (isIdEqual && item.user.toString() === req.user.userId) {
+        authorised = true;
+      }
+      return !isIdEqual;
+    });
+
+    // if comment was not found
+    if (newComments.length === post.comments.length)
+      return res.status(400).json(getErrorsObj("comment not found"));
+
+    if (!authorised)
+      return res.status(401).json(getErrorsObj("user not authorised"));
+
+    post.comments = newComments;
 
     await post.save();
 
